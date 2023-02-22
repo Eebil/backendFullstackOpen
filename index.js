@@ -7,7 +7,7 @@ const Person = require('./models/person')
 
 const app = express()
 
-morgan.token('post', function (req, res) { return JSON.stringify(req.body) })
+morgan.token('post', function (req) { return JSON.stringify(req.body) })
 
 app.use(cors())
 app.use(express.json())
@@ -52,11 +52,6 @@ app.get('/info' , (req, res) => {
   })
 })
 
-// Not in use anymore
-const generateId = () => {
-  return Math.floor(Math.random() * 10000000)
-}
-
 app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
@@ -68,7 +63,7 @@ app.post('/api/persons', (request, response, next) => {
   person.save().then(savedPerson => {
     response.json(savedPerson)
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 
 })
 
@@ -87,18 +82,18 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
-  const {name, number} = request.body
+  const { name, number } = request.body
 
   Person.findByIdAndUpdate(
     request.params.id,
-    {name, number},
+    { name, number },
     { new: true, runValidators: true, context: 'query' }
   )
     .then(updatedPerson => {
